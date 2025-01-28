@@ -1,5 +1,4 @@
 possible_points<-c(-7,-3,3,7)
-possible_points<-c(-7,-3,3,7)
 
 
 rnd_pt_function<-function(down,ytg,fp){
