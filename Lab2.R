@@ -1,4 +1,5 @@
 possible_points<-c(-7,-3,3,7)
+possible_points<-c(-7,-3,3,7)
 
 rnd_pt_function<-function(down,ytg,fp){
   return(sample(possible_points,1))
@@ -25,9 +26,21 @@ proccess_state <- function(down,ytg,fp,team){
   if (fp > 110) {
     score <- score + 3 
   }
-  else (fp > 100 & fp <= 110) {
-    score <- score + 7 
-  } 
-  return score*team
+  else if (fp > 100 & fp <= 110) {
+    score <- score + 7 } 
   
+  added_points<-score*team
+  
+  next_team<-team
+  if(added_points>0){
+    next_team<-opponent
+  }
+  else  if(added_points<0){
+    next_team<-reference
+  }
+  
+  return (c(added_points,next_team))
+}
+
+
   
