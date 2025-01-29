@@ -15,7 +15,7 @@ rnd_pt_function()
 ## Returns a state of the game
 drive <- function(down,ytg,fp){
   next_fp <-sample.int(120,1)
-  next_state <- c(1,10,location)
+  next_state <- c(1,10,next_fp)
   return(next_state)
 }
 drive()
@@ -66,7 +66,8 @@ simulate_epoch <- function(down, ytg, fp) {
     added_points <- result[1]
     team <- result[2]
     
-    # if the team scores 
+
+    # If the team scores 
     if (added_points != 0) {
       score <- added_points
     }
@@ -81,6 +82,7 @@ simulate_epoch <- function(down, ytg, fp) {
   
   return(score)
 }
+
 
 
 # Top-Level Function (simulates game)
