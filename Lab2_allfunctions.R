@@ -90,7 +90,7 @@ simulate_game <- function(down, ytg, fp, n = 1000) {
   for (i in 1:n) {
     results[i] <- simulate_epoch(down, ytg, fp)
   }
-  mean(results)
+  results
 }
 
 
