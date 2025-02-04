@@ -128,7 +128,7 @@ yearly_matrix<-function(year){
   }
   state_vector
   
-  # Agjust State Vector to Sort It
+  # Adjust State Vector to Sort It
   
   state_vectorT<-t(state_vector)
   
