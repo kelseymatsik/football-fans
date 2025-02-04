@@ -55,7 +55,7 @@ for (i in 1:10000) {
 }
 state_vector
 
-# Adjust State Vector
+# Agjust State Vector to Sort It
 
 state_vectorT<-t(state_vector)
 
@@ -67,4 +67,6 @@ state_vector_with_rownames <- rownames_to_column(state_vector_df, var = "RowID")
 
 #Sorted State Vector as a Data Frame
 
-sorted_state<-df_with_rownames[order(state_vector_with_rownames[, 2],decreasing=T), ]
+sorted_state<-state_vector_with_rownames[order(state_vector_with_rownames[, 2],decreasing=T), ]
+
+sorted_state
