@@ -147,6 +147,9 @@ yearly_matrix<-function(year){
   
 }
 
-
+combined_years<-matrix(ncol = 3, nrow = 0)
+for (i in c(2014,2015,2016)){
+  combined_years<-rbind(combined_years,yearly_matrix(i))
+}
 
 
