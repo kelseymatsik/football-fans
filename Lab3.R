@@ -55,15 +55,38 @@ for (i in 1:10000) {
 }
 state_vector
 
-# Output rankings
-ranking <- sort(state_vector, decreasing=TRUE)
-ranking
-
-# Create data frame with teams and simulated probabilities
-# Can't get this to work... 
-ranking <- data.frame(Team = names(state_vector), Probability = state_vector) 
-ranking <- ranking[order(-ranking$Probability),]
-ranking
-
-
-
+state_vector <- c(
+  ANA = 0.03219857, 
+  ARI = 0.03200487, 
+  ATL = 0.03445328, 
+  BAL = 0.03316139, 
+  BOS = 0.03584793,
+  CHA = 0.02930756, 
+  CHN = 0.0348977, 
+  CIN = 0.03064543, 
+  CLE = 0.03454301, 
+  COL = 0.0304538,
+  DET = 0.02959835, 
+  HOU = 0.03721329, 
+  KCA = 0.02999425, 
+  LAN = 0.03948072, 
+  MIA = 0.02969201,
+  MIL = 0.03498321, 
+  MIN = 0.03187847, 
+  NYA = 0.03830918, 
+  NYN = 0.03341753, 
+  OAK = 0.03197763,
+  PHI = 0.03243858, 
+  PIT = 0.03138499, 
+  SDN = 0.03235099, 
+  SEA = 0.03394242, 
+  SFN = 0.03400499,
+  SLN = 0.03536689, 
+  TBA = 0.0366062, 
+  TEX = 0.03184672, 
+  TOR = 0.03532205, 
+  WAS = 0.032678
+)
+sorted_state_vector <- sort(state_vector, decreasing = TRUE)
+sorted_state <- as.data.frame(sorted_state_vector)
+sorted_state
