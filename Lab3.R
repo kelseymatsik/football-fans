@@ -71,11 +71,15 @@ sorted_state<-state_vector_with_rownames[order(state_vector_with_rownames[, 2],d
 
 sorted_state
 
+sorted_state$ranking<-seq_along(sorted_state$RowID)
 
-# Function for creating a sorted state for just one specified year
+#-------------------------------------------------------------------------------------------------------------
+# Question 2: Which teams appear in the yearly top five the most?
+
 
 library(tidyverse)
 
+# Function for creating a sorted state for just one specified year
 
 yearly_matrix<-function(year){
   
@@ -128,7 +132,7 @@ yearly_matrix<-function(year){
   }
   state_vector
   
-  # Adjust State Vector to Sort It
+  # Agjust State Vector to Sort It
   
   state_vectorT<-t(state_vector)
   
@@ -147,9 +151,24 @@ yearly_matrix<-function(year){
   
 }
 
+
+#This for loop creates a ranking for every year in the data set and combines it into one df.
+
+all_years<-unique(game_data$season)
+
 combined_years<-matrix(ncol = 3, nrow = 0)
-for (i in c(2014,2015,2016)){
+for (i in all_years){
   combined_years<-rbind(combined_years,yearly_matrix(i))
 }
 
 
+# The df filtered to have only top five for each year.
+
+top5<-combined_years %>% filter(ranking<=5)
+
+# The counts for each team for the number of times they are in the top five.
+
+table(top5$RowID)
+
+# The teams that appeared the most in the top five across the years were LAN with 7 appearances,
+# HOU with 5 appearances,BOS and ATL with four appearances.
