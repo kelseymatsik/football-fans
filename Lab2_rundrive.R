@@ -40,7 +40,7 @@ run_drive <- function(down, ytg, fp) {
   } else { # End drive 
     # NOTE: Need to implement switching possession - Do we go back to drive 1? 
     list(down = new_state$down, ytg = new_state$ytg, fp = new_state$fp, 
-         drive = drive_number + 1)
+         drive = drive_number + 1) # Go to next drive 
   }
 }
 
