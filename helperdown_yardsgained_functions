@@ -34,30 +34,72 @@ downs_123<-function(D,YTG,FP){
 }
 
 
-# Not complete function
 
+# I made a seperate helping function to decide the play in a fourth down
 
-down_4<-function(){
-  options <- sample(c("fieldgoal", "punt", "goforit"), 1, prob=c((1/3), (1/3), (1/3)))
+playChoice(YTG,FP){
+  if(YTG<5)
+  {
+    return("go_for_it")
+  }
+  else{
+    if(FP<50){
+      return("field_goal")
+    }
+    else{
+      return("punt")
+    }
+  }
 }
 
-run_drive <- function(D, YTG, FP){
-  
-  # get new state
-  new_state <- run_play(D, YTG, FP)
-  
-  # Check if we should return the state or run a new play
-  if(new_state$exit_drive==0){
+
+# This code simulates the fourth down.
+
+
+down_4 <- function(D, YTG, FP, play_type, play_result = NULL) {
+  # Initialize the flag to indicate whether the epoch function should be triggered
+  flag <- 0
+  play_type<-playChoice(YTG,FP)
     
-    # if we should stay with the current drive, simply call it again with the
-    # new state
-    run_drive(new_state$D, new_state$YTG, new_state$FP)
-    
-  } else {
-    
-    # otherwise, return the current state to the run_epoch function
-    list(D=new_state$D, YTG=new_state$YTG, FP=new_state$FP)
-    
+  # Handling Field Goal Scenario
+  if (play_type == 'field_goal') {
+    if (play_result == 'made') {
+      # Successful field goal, set FP to 115 and return to epoch function
+      new_state <- list(D = D, YTG = YTG, FP = 115)
+      flag <- 1
+    } else if (play_result == 'missed') {
+      # Missed field goal, possession switches, return to epoch function
+      new_state <- list(D = D, YTG = YTG, FP = FP)
+      flag <- 1
+    }
   }
   
+  # Handling Punt Scenario
+  else if (play_type == 'punt') {
+    if (play_result == 'typical') {
+      # Typical punt, possession switches to epoch function
+      new_state <- list(D = D, YTG = YTG, FP = FP)
+      flag <- 1
+    } else if (play_result == 'rare') {
+      # Rare scenario (e.g., mishandled punt), stay in drive function and continue
+      new_state <- list(D = D, YTG = YTG, FP = FP)
+      flag <- 0
+    }
+  }
+  
+  # Handling Go for It Scenario
+  else if (play_type == 'go_for_it') {
+    if (play_result == 'successful') {
+      # Successful "go for it" play, stay in the drive with updated first down
+      new_state <- list(D = 1, YTG = 10, FP = FP + yards_gained(FP))
+      flag <- 0
+    } else if (play_result == 'unsuccessful') {
+      # Unsuccessful "go for it" play, possession switches, return to epoch function
+      new_state <- list(D = D, YTG = YTG, FP = FP)
+      flag <- 1
+    }
+  }
+  
+  # Return the updated state and flag (0 or 1)
+  return(list(state = new_state, flag = flag))
 }
