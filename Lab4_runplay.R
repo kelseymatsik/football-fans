@@ -1,46 +1,20 @@
-# Down helper functions 
-# down_one()...
-# down_two()...
-# down_three()...
-
-YG <- 0 # NOTE: Need to figure out distribution for yards gained 
-# downs 1-3: 
-# 
-
-down_one() <- function{
-  if (YG < 10){
-    YG  
-  }
-  else{ # If the team scores more than 10 yards, then go back to the first down
-    down_one() 
-    # NOTE: need to incorporate field position 
-  }
-}
-
-down_two() <- function{
-  if (YG < 10){
-    YG  
-  }
-  else{ # If the team scores more than 10 yards, then go back to the first down
-    down_one() 
-    # NOTE: need to incorporate field position 
-  }
-}
-
-down_three() <- function{
-  if (YG < 10){
-    YG  
-  }
-  else{ # If the team scores more than 10 yards, then go back to the first down
-    down_one() 
-    fp <-  
-  }
-}
-
-down_four() <- 
-
-run_play() <- function{
+run_play <- function(D, YTG, FP, team) {
+  down <- 1  # Start from first down
   
-  # Instead of sampling FP, we'll sample YG 
-  
+  while (down <= 3) {  # Loop until 4th down is reached
+    result <- downs_123(D, YTG, FP)  # Get play result
+    D <- result[1]
+    YTG <- result[2]
+    FP <- result[3]
+    team <- result[4]  # Check if team possession changes
+    
+    if (team == 1) {  # Turnover occurred
+      down <- 1  # Reset to first down for the other team
+      print("Turnover! Possession switched.")
+      break
+    } else {
+      down <- down + 1  # Move to next down
+    }
   }
+  print(paste("End of play: Down", down, "| Yards to Go:", YTG, "| Field Position:", FP, "| Team:", team))
+}
