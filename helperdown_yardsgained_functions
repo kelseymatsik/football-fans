@@ -16,7 +16,6 @@ yards_gained<- function(FP){
 }
 
 
-
 downs_123<-function(D,YTG,FP){
   options <- sample(c("NoTurnover", "Turnover", "Touchdown"), 1, prob=c((0.50), (0.35), (0.15)))
   YG<- yards_gained(FP)
@@ -26,10 +25,11 @@ downs_123<-function(D,YTG,FP){
   }
   else if(options="Turnover"){
     turnover<-c(D,YTG,FP,1)
-    return()
+    return(turnover)
   }
   else{
     touchdown<-c(D,YTG,105,1)
+    return(touchdown)
   }
 }
 
