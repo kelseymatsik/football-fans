@@ -45,12 +45,12 @@ data <- readRDS("pbp2014-2024.rds")
 onlyDown4<-data %>% filter(down==4) %>% rename(YTG=ydstogo,FP=yardline_100) %>% filter(play_type %in% c("field_goal","punt","run"))
 
 # Fit the multinomial logistic regression model
-model <- multinom(play_type ~ YTG + FP, data = onlyDown4)
+multinom_model <- multinom(play_type ~ YTG + FP, data = onlyDown4)
 
 # Define the simulation function
 playChoice <- function(YTG, FP) {
   # Compute the predicted probabilities for each play choice
-  probabilities <- predict(model, newdata = data.frame(YTG = YTG, FP = FP), type = "probs")
+  probabilities <- predict(multinom_model, newdata = data.frame(YTG = YTG, FP = FP), type = "probs")
   
   # Randomly select a play choice based on probabilities
   play_choice <- sample(c("field_goal", "punt", "go_for_it"), size = 1, prob = probabilities)
