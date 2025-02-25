@@ -35,21 +35,29 @@ downs_123<-function(D,YTG,FP){
 
 
 # I made a seperate helping function to decide the play in a fourth down
+# Fit multinomial logistic regression model (using `nnet` package)
+# Used this function to predict the play choice in lab 4
+library(tidyverse)
+library(nnet)
 
-playChoice(YTG,FP){
-  if(YTG<5)
-  {
-    return("go_for_it")
-  }
-  else{
-    if(FP<50){
-      return("field_goal")
-    }
-    else{
-      return("punt")
-    }
-  }
+data <- readRDS("pbp2014-2024.rds")
+
+onlyDown4<-data %>% filter(down==4) %>% rename(YTG=ydstogo,FP=yardline_100) %>% filter(play_type %in% c("field_goal","punt","run"))
+
+# Fit the multinomial logistic regression model
+model <- multinom(play_type ~ YTG + FP, data = onlyDown4)
+
+# Define the simulation function
+playChoice <- function(YTG, FP) {
+  # Compute the predicted probabilities for each play choice
+  probabilities <- predict(model, newdata = data.frame(YTG = YTG, FP = FP), type = "probs")
+  
+  # Randomly select a play choice based on probabilities
+  play_choice <- sample(c("field_goal", "punt", "go_for_it"), size = 1, prob = probabilities)
+  
+  return(play_choice)
 }
+
 
 set.seed(3402)
 n <- 500  
