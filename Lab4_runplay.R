@@ -20,9 +20,8 @@ run_play <- function(D, YTG, FP, team) {
       }
     } else {  # Fourth down scenario
       play_type <- playChoice(YTG, FP)  # Determine the play type
-      play_result <- sample(c("made", "missed", "typical", "rare", "successful", "unsuccessful"), 1)  # Simulated play result
       
-      down_4_result <- down_4(D, YTG, FP, play_type, play_result)
+      down_4_result <- down_4(D, YTG, FP, play_type)
       new_state <- down_4_result$state
       flag <- down_4_result$flag
       
