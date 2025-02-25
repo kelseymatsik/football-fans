@@ -78,7 +78,7 @@ down_4 <- function(D, YTG, FP, play_type) {
   
   # Handling Punt Scenario
   else if (play_type == 'punt') {
-    play_result <- sample(c("typical", "rare"), 1)
+    play_result <- sample(c("typical", "rare"), 1,prob=c(0.9,0.1)
     if (play_result == 'typical') {
       # Typical punt, possession switches to epoch function
       new_state <- list(D = D, YTG = YTG, FP = FP)
