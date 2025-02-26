@@ -1,3 +1,10 @@
+library(tidyverse)
+library(nnet)
+
+data <- readRDS("pbp2014-2024.rds")
+
+## yards_gained()
+# Randomly generates the yards gained for the team with possession
 yards_gained<- function(FP){
   halfed<-as.integer((100-FP)/2)
   next_field_position<- sample(c("less_than_10","first_half_FP","second_half_FP"),1,prob=c(0.5,0.25,0.25))
@@ -14,7 +21,8 @@ yards_gained<- function(FP){
   
 }
 
-
+## downs_123()
+# Simulates outcomes for downs 1, 2, 3 
 downs_123<-function(D,YTG,FP){
   options <- sample(c("NoTurnover", "Turnover", "Touchdown"), 1, prob=c((0.50), (0.35), (0.15)))
   YG<- yards_gained(FP)
@@ -32,25 +40,21 @@ downs_123<-function(D,YTG,FP){
   }
 }
 
+## Using Multinomial Regression to determine which play to run 
 
+# Filter data for only 4th down 
+onlyDown4 <- data %>% 
+  filter(down==4) %>% 
+  rename(YTG=ydstogo,FP=yardline_100) %>% 
+  filter(play_type %in% c("field_goal","punt","run"))
 
-# I made a seperate helping function to decide the play in a fourth down
-# Fit multinomial logistic regression model (using `nnet` package)
-# Used this function to predict the play choice in lab 4
-library(tidyverse)
-library(nnet)
+mult.model <- multinom(play_type ~ YTG + FP, data = onlyDown4)
 
-data <- readRDS("pbp2014-2024.rds")
-
-onlyDown4<-data %>% filter(down==4) %>% rename(YTG=ydstogo,FP=yardline_100) %>% filter(play_type %in% c("field_goal","punt","run"))
-
-# Fit the multinomial logistic regression model
-multinom_model <- multinom(play_type ~ YTG + FP, data = onlyDown4)
-
-# Define the simulation function
+## playChoice() 
+# Determines the play type in the 4th down
 playChoice <- function(YTG, FP) {
   # Compute the predicted probabilities for each play choice
-  probabilities <- predict(multinom_model, newdata = data.frame(YTG = YTG, FP = FP), type = "probs")
+  probabilities <- predict(mult.model, newdata = data.frame(YTG = YTG, FP = FP), type = "probs")
   
   # Randomly select a play choice based on probabilities
   play_choice <- sample(c("field_goal", "punt", "go_for_it"), size = 1, prob = probabilities)
@@ -59,31 +63,32 @@ playChoice <- function(YTG, FP) {
 }
 
 
-set.seed(3402)
-n <- 500  
+## Using Logistic Regression to Predict Field Goal Outcome 
+# Get field goal positions from data for relevant plays
+field_position <- data$yardline_100
+field_position <- field_position %>% filter(field_goal_result %in% c("made", "missed"))
+n <- 1000 # Set number of field goals to calculate success from 
 
-# Simulating data and fitting Logistic Regression model 
-# Predicting field goal outcome
 data <- data.frame(
-  field_position = sample(10:60, n, replace = TRUE),  # Field goals attempted between 10-60 yards
+  field_position = field_position,
   field_goal_success = rbinom(n, 1, prob = 1 / (1 + exp(-(3 - 0.1 * sample(10:60, n, replace = TRUE)))))  # Sigmoid function
 )
 
-model <- glm(field_goal_success ~ field_position, data = data, family = binomial)
+log.model <- glm(field_goal_success ~ field_position, data = data, family = binomial)
 
-# This code simulates the fourth down.
+## down_4 
+# Simulates the 4th down 
+# NOTE: Uses logistic regression model (log.model) above
 down_4 <- function(D, YTG, FP, play_type) {
   # Initialize the flag to indicate whether the epoch function should be triggered
   flag <- 0
   play_type<-playChoice(YTG,FP)
   play_result <- NULL
   
-  # Handling Field Goal Scenario
+  # Field Goal Scenario
   if (play_type == 'field_goal') {
-    
-    # Predict probability of success using logistic regression 
-    
-    prob_success <- predict(model, newdata = data.frame(field_position = FP), type = "response")
+    # Predict probability of field goal success using log.model 
+    prob_success <- predict(log.model, newdata = data.frame(field_position = FP), type = "response")
     play_result <- ifelse(runif(1) < prob_success, 'made', 'missed')
     
     play_result <- sample(c("made", "missed"), 1)
@@ -98,7 +103,7 @@ down_4 <- function(D, YTG, FP, play_type) {
     }
   }
   
-  # Handling Punt Scenario
+  # Punt Scenario
   else if (play_type == 'punt') {
     play_result <- sample(c("typical", "rare"), 1,prob=c(0.9,0.1))
                           if (play_result == 'typical') {
@@ -112,7 +117,7 @@ down_4 <- function(D, YTG, FP, play_type) {
                           }
   }
   
-  # Handling Go for It Scenario
+  # Go for It Scenario
   else if (play_type == 'go_for_it') {
     play_result <- sample(c("successful", "unsuccessful"), 1)
     if (play_result == 'successful') {
