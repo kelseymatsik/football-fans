@@ -1,3 +1,7 @@
+## Lab5.R contains the same base code as Lab4_helper_down_functions but uses 
+## logistic regression and multinomial regression to predict the probability of success for a field goal 
+## and to predict the play type on the 4th down 
+
 library(tidyverse)
 library(nnet)
 
