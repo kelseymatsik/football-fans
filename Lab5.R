@@ -83,7 +83,7 @@ log.model <- glm(field_goal_success ~ field_position, data = data, family = bino
 ## down_4 
 # Simulates the 4th down 
 # NOTE: Uses logistic regression model (log.model) above
-down_4 <- function(D, YTG, FP, play_type) {
+down_4 <- function(D, YTG, FP, play_type, model) {
   # Initialize the flag to indicate whether the epoch function should be triggered
   flag <- 0
   play_type<-playChoice(YTG,FP)
@@ -92,7 +92,7 @@ down_4 <- function(D, YTG, FP, play_type) {
   # Field Goal Scenario
   if (play_type == 'field_goal') {
     # Predict probability of field goal success using log.model 
-    prob_success <- predict(log.model, newdata = data.frame(field_position = FP), type = "response")
+    prob_success <- predict(model, newdata = data.frame(field_position = FP), type = "response")
     play_result <- ifelse(runif(1) < prob_success, 'made', 'missed')
     
     play_result <- sample(c("made", "missed"), 1)
@@ -106,6 +106,9 @@ down_4 <- function(D, YTG, FP, play_type) {
       flag <- 1
     }
   }
+
+  # Note: For this scenario, we want to call log.model as our model parameter in down_4(). 
+  model <- log.model
   
   # Punt Scenario
   else if (play_type == 'punt') {
