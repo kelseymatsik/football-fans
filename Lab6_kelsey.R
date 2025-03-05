@@ -71,7 +71,39 @@ test_data <- expand.grid(
 test_data$Predicted_Shots <- predict(poisson_model1, newdata = test_data, type = "response")
 head(test_data, 5)
 
+################################ Problem 2 #####################################
 
-# Problem 3 
-# Use Poisson, logistic regression, etc. 
-# e.g. shot count would be Poisson, shot probabilities would be logistic regression 
+class(data2$xC)
+class(data2$yC)
+
+summary(data2$xC)
+summary(data2$yC)
+# 0, 0 --> center 
+# - values
+
+sum(is.na(data2$xC) & is.na(data2$yC))
+
+# Drop rows with missing position data 
+data3 <- data2[!(is.na(data2$xC) & is.na(data2$yC)), ]
+sum(is.na(data3$xC) & is.na(data3$yC)) 
+
+
+## Create categorical "region" variable
+# Define breaks for six regions along the x-axis
+breaks <- seq(-100, 100, length.out = 7)
+data3$Region <- cut(data3$xC, breaks = breaks, labels = c(1,2,3,4,5,6), 
+                   include.lowest = TRUE) 
+data3$Region <- as.character(data3$Region)
+unique(data3$Region)
+
+## Summarize shot counts by team, period, region (position), point differential
+shot_count_data2 <- data3 %>% 
+  group_by(Ev_Team, Period, Point_Diff, Time_Bin, Region) %>% 
+  summarize(Shot_Count = n(), .groups = "drop")
+
+## Fit the Poisson regression model 
+poisson_model2 <- glm(Shot_Count ~ Period + Point_Diff + Time_Bin + Region, 
+                      data = shot_count_data2, family = poisson())
+
+summary(poisson_model2)
+
