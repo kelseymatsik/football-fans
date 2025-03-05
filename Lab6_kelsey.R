@@ -107,3 +107,71 @@ poisson_model2 <- glm(Shot_Count ~ Period + Point_Diff + Time_Bin + Region,
 
 summary(poisson_model2)
 
+############################# Problem 3 ################################################################
+
+data_p3<-data %>% mutate(goal= str_detect(Description, "ONGOAL"))
+
+data_p3.1<-data_p3 %>% filter(Event %in% c("SHOT","MISS"))
+
+
+
+
+# View unique periods 
+unique(data_p3.1$Period) # 1, 2, 3, 4, 5
+
+# View range of values for Time_Elapsed 
+list(c(min(data_p3.1$Time_Elapsed),(max(data_p3.1$Time_Elapsed)))) # isn't accurate 
+class(data_p3.1$Time_Elapsed) # character; can't be converted to numeric
+
+# View range of Seconds_Elapsed 
+class(data_p3.1$Seconds_Elapsed)
+list(c(min(data_p3.1$Seconds_Elapsed),(max(data_p3.1$Seconds_Elapsed))))
+# There is 1200 seconds per each period (or 20 mins). 
+# For the sake of the problem, we will ignore periods 4 and 5 (they are overtime). 
+
+# Get only relevant periods (not including overtime)
+data2_p3 <- data_p3.1 %>% 
+  filter(Period %in% c(1, 2, 3))
+
+
+# Convert Period to a categorical variable
+data2_p3$Period <- as.factor(data2_p3$Period)
+
+# Adding Time_Bin (making time a categorical variable)
+data2_p3 <- data2_p3 %>% 
+  # Make Seconds_Elapsed categorical 
+  mutate(Time_Bin = case_when(
+    Seconds_Elapsed < 400  ~ "Early",
+    Seconds_Elapsed < 800  ~ "Mid",
+    TRUE                ~ "Late"
+  ))
+
+## Summarize shot counts by team, period, and point differential
+# Each row represents a shot 
+shot_count_data3 <- data2_p3 %>% 
+  group_by(Ev_Team, Period, goal, Time_Bin) %>% 
+  summarize(Shot_Count = n(), .groups = "drop")
+
+## Fit the Poisson regression mode 
+poisson_model3 <- glm(Shot_Count ~ Period + goal + Time_Bin, 
+                      data = shot_count_data, family = poisson())
+# summary(model1)
+
+## Testing the Model / Making Predictions 
+
+# Generate test data
+set.seed(3402)
+test_data <- expand.grid(
+  Ev_Team = unique(shot_count_data3$Ev_Team),
+  Period = as.factor(c(1, 2, 3)),
+  Point_Diff = seq(min(shot_count_data3$Point_Diff, na.rm = TRUE), 
+                   max(shot_count_data3$Point_Diff, na.rm = TRUE), by = 1),
+  Time_Bin = c("Early", "Mid", "Late")
+)
+
+# Make predictions 
+test_data$Predicted_Shots <- predict(poisson_model3, newdata = test_data, type = "response")
+head(test_data, 5)
+
+
+
