@@ -15,8 +15,8 @@ red_zone_data <- play_data[play_data$start_position >= 80, "yards_gained"]
 non_red_zone_data <- play_data[play_data$start_position < 80, "yards_gained"]
 
 ### Fit mixture models 
-mix_red_zone <- normalmixEM(red_zone_data, k = 2) # What is k=2?
-mix_non_red_zone <- normalmixEM(non_red_zone_data, k = 2)
+red_zone_data <- data[data$yardline_100 >= 80, "yards_gained"]
+non_red_zone_data <- data[data$yardline_100 < 80, "yards_gained"]
 
 ### Visualize
 # plot(mix_red_zone, density = TRUE, main = "Red Zone Yardage Distribution")
