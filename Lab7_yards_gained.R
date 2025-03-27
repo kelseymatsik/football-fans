@@ -1,3 +1,6 @@
+library(mixtools) # mixture models 
+library(mclust)
+
 ###  Red zone: last 20 years before the end zone 
 ## Teams adjust their strategies in the red zone because they're close to scoring 
 ## Plays can't gain more than (100 - field_position) yards 
@@ -54,7 +57,7 @@ simulate_play <- function(field_position) {
   
   # If play is successful, move to yards gained step
   yards <- sample_yards(field_position)
-  return(list(type = play_type, result = "success", yards = yards))
+  list(type = play_type, result = "success", yards = yards)
 }
 
 
