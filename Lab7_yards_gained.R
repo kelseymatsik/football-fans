@@ -32,6 +32,29 @@ sample_yards <- function(FP) {
   yards_gained # Q: Not sure if this is yards gained 
 }
 
+### Decision Tree Logic 
+simulate_play <- function(field_position) {
+  play_type <- sample(c("run", "pass"), size = 1, prob = c(0.5, 0.5))
+  
+  if (play_type == "pass") {
+    interception <- rbinom(1, 1, 0.05)  
+    if (interception == 1) return(list(type = "pass", result = "interception", yards = -sample(0:20, 1)))
+    
+    incompletion <- rbinom(1, 1, 0.3)
+    if (incompletion == 1) return(list(type = "pass", result = "incomplete", yards = 0))
+  }
+  
+  if (play_type == "run") {
+    fumble <- rbinom(1, 1, 0.02)
+    if (fumble == 1) return(list(type = "run", result = "fumble", yards = -sample(0:10, 1)))
+  }
+  
+  # If play is successful, move to yards gained step
+  yards <- sample_yards(field_position)
+  return(list(type = play_type, result = "success", yards = yards))
+}
+
+
 ### 3. Update Simulation to Incoporate Field Position 
 ## This is our NEW yards gained function
 ## References helper down functions 
