@@ -32,7 +32,10 @@ sample_yards <- function(FP) {
   yards_gained # Q: Not sure if this is yards gained 
 }
 
-### Decision Tree Logic 
+### 3. Update Simulation to Incoporate Field Position 
+## This is our NEW yards gained function
+## References helper down functions 
+## Decision Tree Logic 
 simulate_play <- function(field_position) {
   play_type <- sample(c("run", "pass"), size = 1, prob = c(0.5, 0.5))
   
@@ -54,20 +57,6 @@ simulate_play <- function(field_position) {
   return(list(type = play_type, result = "success", yards = yards))
 }
 
-
-### 3. Update Simulation to Incoporate Field Position 
-## This is our NEW yards gained function
-## References helper down functions 
-yards_gained <- function(fp) {
-  play <- run_play() # Calls run_play function to get the down, yards to go, and field position 
-  if (play$play_result == "successful") {
-    yards <- sample_yards(field_position)
-    # Q: Does 'yards' and 'field_position' need to match our variable names in helper_down.R?
-    return(list(type = play$play_type, result = "successful", yards = yards, new_position = field_position + yards))
-  } else {
-    play
-  }
-}
 
 ## Test -- try later 
 set.seed(123)
