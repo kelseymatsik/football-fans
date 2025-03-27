@@ -34,6 +34,7 @@ sample_yards <- function(FP) {
 
 ### 3. Update Simulation to Incoporate Field Position 
 ## This is our NEW yards gained function
+## References helper down functions 
 yards_gained <- function(fp) {
   play <- run_play() # Calls run_play function to get the down, yards to go, and field position 
   if (play$play_result == "successful") {
