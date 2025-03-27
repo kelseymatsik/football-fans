@@ -1,6 +1,9 @@
 library(mixtools) # mixture models 
 library(mclust)
 
+
+data <- readRDS("pbp2014-2024.rds")
+
 ###  Red zone: last 20 years before the end zone 
 ## Teams adjust their strategies in the red zone because they're close to scoring 
 ## Plays can't gain more than (100 - field_position) yards 
