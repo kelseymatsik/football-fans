@@ -1,9 +1,3 @@
-library(mixtools) # mixture models 
-library(mclust)
-
-
-data <- readRDS("pbp2014-2024.rds")
-
 ###  Red zone: last 20 years before the end zone 
 ## Teams adjust their strategies in the red zone because they're close to scoring 
 ## Plays can't gain more than (100 - field_position) yards 
@@ -11,12 +5,29 @@ data <- readRDS("pbp2014-2024.rds")
 ### 1. Split Yards Gained into Red Zone and Non-Red Zone 
 # Define red zone as starting position ≥ 80 yards (within 20 yards of the end zone)
 ## Q: Bring in run_play (or another function) here? Not sure what play_data is for us. 
-red_zone_data <- play_data[play_data$start_position >= 80, "yards_gained"]
-non_red_zone_data <- play_data[play_data$start_position < 80, "yards_gained"]
+library(mixtools) # mixture models 
+library(mclust)
 
-### Fit mixture models 
-red_zone_data <- data[data$yardline_100 >= 80, "yards_gained"]
-non_red_zone_data <- data[data$yardline_100 < 80, "yards_gained"]
+data <- readRDS("pbp2014-2024.rds")
+
+non_red_zone_data <- as.numeric(unlist(data[data$yardline_100 < 80, "yards_gained"]))
+red_zone_data <- as.numeric(unlist(data[data$yardline_100 >= 80, "yards_gained"]))
+
+non_red_zone_data <- non_red_zone_data[!is.na(non_red_zone_data) & 
+                                         !is.infinite(non_red_zone_data) & 
+                                         !is.nan(non_red_zone_data)]
+
+red_zone_data <- red_zone_data[!is.na(red_zone_data) & 
+                                 !is.infinite(red_zone_data) & 
+                                 !is.nan(red_zone_data)]
+
+# Check the class to confirm it's a vector
+class(non_red_zone_data)  # Should return "numeric"
+class(red_zone_data)      # Should return "numeric"
+
+# Fit the mixture model
+mix_non_red_zone <- Mclust(non_red_zone_data, G = 2)  # G is the number of components
+mix_red_zone <- Mclust(red_zone_data, k = 2)
 
 ### Visualize
 # plot(mix_red_zone, density = TRUE, main = "Red Zone Yardage Distribution")
@@ -59,18 +70,16 @@ simulate_play <- function(field_position) {
   }
   
   # If play is successful, move to yards gained step
-  yards <- sample_yards(field_position)
-  list(type = play_type, result = "success", yards = yards)
+  yards <- sample_yards(FP=field_position)
+  return(list(type = play_type, result = "success", yards = yards))
 }
 
 
 ## Test -- try later 
 set.seed(123)
-simulated_play1 <- yards_gained(fp = 50)  # Non-red zone
-simulated_play2 <- yards_gained(fp = 85)  # Red zone
+simulated_play1 <- simulate_play(50)  # Non-red zone
+simulated_play2 <- simulate_play(85)  # Red zone
 
 print(simulated_play1)
 print(simulated_play2)
 
-### FINISH LATER 
-## Implement "decision tree" logic in sample_yards
